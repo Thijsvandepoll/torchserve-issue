@@ -13,7 +13,7 @@ python build.py
 
 Archive the model:
 ```
-torch-model-archiver --model-name custom_model --version 1.0 --serialized-file ./pytorch_model.bin --handler ./handler.py --extra-files "./config.json,./special_tokens_map.json,./tokenizer.json,./tokenizer_config.json,./vocab.txt" -r model.requirements.txt && mv custom_model.mar model_store
+torch-model-archiver --model-name custom_model --version 1.0 --serialized-file ./pytorch_model.bin --handler ./handler.py --extra-files "./config.json,./special_tokens_map.json,./tokenizer.json,./tokenizer_config.json,./vocab.txt" --requirements-file ./requirements.txt && mv custom_model.mar model_store
 ```
 
 Serve the model in Docker:
@@ -33,10 +33,10 @@ docker build -t torchserve-custom:latest .
 
 Serve the container:
 ```
-docker run --rm -it -p 8080:8080 -p 8082:8082 -v $(pwd)/model_store:/model-store torchserve-custom:latest torchserve --start --model-store model-store --models custom_model=custom_model.mar --ncs --foreground
+docker run --rm -it -p 8090:8080 -p 8092:8082 -v $(pwd)/model_store:/model-store torchserve-custom:latest torchserve --start --model-store model-store --models custom_model=custom_model.mar --ncs --foreground
 ```
 
 Now create a request. This should respond much quicker than the other. Please try it a couple of times:
 ```
-curl -v -H "Content-Type: application/json" http://localhost:8080/predictions/custom_model --data '{"instances": ["This is an example sentence"]}'
+curl -v -H "Content-Type: application/json" http://localhost:8090/predictions/custom_model --data '{"instances": ["This is an example sentence"]}'
 ```
